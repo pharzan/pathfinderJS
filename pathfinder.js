@@ -5,6 +5,7 @@ exports.pathFinder=(function PathFinder(request,response){
     var self=this;
     if (!(this instanceof PathFinder)) 
 	return new PathFinder();
+    
     this.routes=[];
     
     this.init=function(request,response){
@@ -46,7 +47,7 @@ exports.pathFinder=(function PathFinder(request,response){
 	if(this.request.method==='GET'){
 	    this.routes.map(function(route){
 		if(route.path===params[0])
-		    route.fn(this.response);
+		    route.onGet(this.response);
 		
 	    });
 	    
@@ -60,12 +61,18 @@ exports.pathFinder=(function PathFinder(request,response){
 	    console.log('params length is bigger',params)
     
 	this.request.on('data', function(chunk) {
-		   
-	    var data=JSON.parse(chunk.toString());
-	    var d=JSON.parse(data)
-	    console.log('Data Received::',d)
-	    self.write('done')
-	    skip=true;
+	    console.log('in the on data');
+	     self.routes.map(function(route){
+		if(route.path===params[0])
+		    route.onPost(this.response);
+		
+	    });
+		   //if in here it is a POST
+	    // var data=JSON.parse(chunk.toString());
+	    // var d=JSON.parse(data)
+	    // console.log('Data Received::',d)
+
+	    
 	});
 	
     };
