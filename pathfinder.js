@@ -45,14 +45,14 @@ exports.pathFinder=(function PathFinder(request,response){
 	params.shift();
 	
 	if(this.request.method==='GET'){
-	    this.routes.map(function(route){
+	    this.routes.map(function(route,i){
 		if(route.path===params[0])
 		    route.onGet(this.response);
-		
-	    });
+		if(i==self.routes.length-1)	    
+		    if(!self.response.finished)
+			self.write('no route found')
+	    })
 	    
-	if(!this.response.finished)
-	    self.response.end();
 	}
 	
 	//console.log(params);
@@ -62,11 +62,15 @@ exports.pathFinder=(function PathFinder(request,response){
     
 	this.request.on('data', function(chunk) {
 	    console.log('in the on data');
-	     self.routes.map(function(route){
+	    self.routes.map(function(route,i){
 		if(route.path===params[0])
 		    route.onPost(this.response);
 		
-	    });
+		if(i==self.routes.length-1)
+		    if(!self.response.finished)
+			self.write('no route found')
+		
+	    })
 		   //if in here it is a POST
 	    // var data=JSON.parse(chunk.toString());
 	    // var d=JSON.parse(data)

@@ -63,6 +63,18 @@ pathFinder.addRoute({
     }
 
 });
+pathFinder.addRoute({
+    path: 'puppy',
+    onGet: function() {
+        console.log('onGet Activated');
+        pathFinder.write('hi from the puppy route config');
+    },
+    onPost:function(){
+	console.log('onPost Activated');
+	pathFinder.write('hi from on POST');
+    }
+
+});
 
 
 server();
