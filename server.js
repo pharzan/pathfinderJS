@@ -3,11 +3,19 @@ var http = require('http'),
     pathFinder = require('./pathfinder.js').pathFinder;
 
 var config = {
-    PORT: 8001
+    PORT: 8001,
+    io: 3000
 };
 
 function server() {
-
+    
+    if(!isNaN(config.io)){
+	var io = require('socket.io')();
+	io.listen(config.io);
+	console.log('socket.io initialized: %s',config.io);
+	pathFinder.init(null,null,io);
+    }
+    
     http.createServer(function(request, response) {
 	
         var responseHeaders = {
@@ -18,8 +26,6 @@ function server() {
             'Access-Control-Allow-Credentials': true,
             "Content-Type": "application/json"
         };
-
-        //response.writeHead(200, responseHeaders);
 
         if (request.method === "OPTIONS") {
             // Add headers to response and send
@@ -44,10 +50,8 @@ function server() {
         pathFinder.init(request, response);
         var r = pathFinder.routeHandler(urlParts, request, response);
 
-        // response.write(JSON.stringify({status:"OK",response:r,urlInfo:urlParts}));
-        // response.end();
     }).listen(config.PORT);
-    console.log("server initialized");
+    console.log("server initialized : %s",config.PORT);
 
 }
 
@@ -58,7 +62,7 @@ pathFinder.addRoute({
         pathFinder.write('hi from the kitty route config');
     },
     onPost:function(){
-	console.log('onPost Activated');
+	console.log('Kitty onPost Activated');
 	pathFinder.write('hi from on POST');
     }
 
@@ -70,11 +74,24 @@ pathFinder.addRoute({
         pathFinder.write('hi from the puppy route config');
     },
     onPost:function(){
-	console.log('onPost Activated');
-	pathFinder.write('hi from on POST');
+	console.log('Puppy onPost Activated');
+	pathFinder.write('hi from on Puppy POST');
     }
 
 });
 
-
 server();
+pathFinder.emit({
+    fn:function(){
+	setInterval(function(){
+	    
+	    pathFinder.io.emit('time', {time: new Date().toJSON()}
+			       
+			      )},1000);
+	
+    }
+
+
+});
+
+

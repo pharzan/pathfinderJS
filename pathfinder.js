@@ -8,9 +8,10 @@ exports.pathFinder=(function PathFinder(request,response){
     
     this.routes=[];
     
-    this.init=function(request,response){
+    this.init=function(request,response,io){
 	this.request=request;
 	this.response=response;
+	this.io=io;
     };
     
     this.addRoute=function(route){
@@ -41,24 +42,27 @@ exports.pathFinder=(function PathFinder(request,response){
 	// }
 	
 	var params=urlParts.pathname.split('/');
-	
 	params.shift();
+	console.log(params)
 	
 	if(this.request.method==='GET'){
-	    this.routes.map(function(route,i){
-		if(route.path===params[0])
-		    route.onGet(this.response);
-		if(i==self.routes.length-1)	    
-		    if(!self.response.finished)
-			self.write('no route found')
-	    })
+	    
+		this.routes.map(function(route,i){
+		    if(route.path===params[0])
+			route.onGet(this.response);
+		    if(i==self.routes.length-1)	    
+			if(!self.response.finished)
+			    self.write('no route found')
+		});
 	    
 	}
 	
 	//console.log(params);
-	var skip=false;
-	if(params.length>1)
+	
+	if(params.length>1){
 	    console.log('params length is bigger',params)
+	    
+	}
     
 	this.request.on('data', function(chunk) {
 	    console.log('in the on data');
@@ -93,6 +97,11 @@ exports.pathFinder=(function PathFinder(request,response){
 	self.response.write(JSON.stringify({message:msg}));
 	self.response.end();
 	
+    };
+
+    this.emit=function(emission){
+	
+	emission.fn.call(this);
     };
     
 })();
